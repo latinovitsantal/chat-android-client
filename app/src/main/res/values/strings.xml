@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">HelloChat</string>
-    <string name="username_hint">Username</string>
+    <string name="username_hint">username</string>
     <string name="password_hint">password</string>
     <string name="show_password">show password</string>
+    <string name="repeat_password_hint">password again</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="password_not_same">The passwords are not the same!</string>
+    <string name="must_enter_username">You must enter username!</string>
 </resources>

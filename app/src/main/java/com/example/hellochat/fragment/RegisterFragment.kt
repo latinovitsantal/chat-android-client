@@ -1,29 +1,21 @@
 package com.example.hellochat.fragment
 
-import android.graphics.*
-import android.opengl.*
 import android.os.*
 import android.support.v4.app.*
-import android.support.v4.content.*
-import android.text.method.*
 import android.view.*
-import android.widget.*
 import com.example.hellochat.*
 import com.example.hellochat.extension.*
-import kotlinx.coroutines.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.*
 import org.jetbrains.anko.support.v4.*
 
-class LoginFragment : Fragment() {
-
-	lateinit var progressBar: ProgressBar
+class RegisterFragment : Fragment() {
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
 			scrollView {
 				verticalLayout {
-					title(R.string.login)
+					title(R.string.register)
 					val usernameText = editText {
 						setHint(R.string.username_hint)
 					}
@@ -31,22 +23,29 @@ class LoginFragment : Fragment() {
 						setHint(R.string.password_hint)
 						hidePassword()
 					}
+					val repeatPasswordText = editText {
+						setHint(R.string.repeat_password_hint)
+						hidePassword()
+					}
 					checkBox(R.string.show_password) {
 						onCheckedChange { _, isChecked ->
-							passwordText.run {
-								if (isChecked) showPassword()
-								else hidePassword()
+							if (isChecked) {
+								passwordText.showPassword()
+								repeatPasswordText.showPassword()
+							}
+							else {
+								passwordText.showPassword()
+								repeatPasswordText.hidePassword()
 							}
 						}
 					}
-					submitButton(R.string.login) {
-						onClick { login(usernameText.value, passwordText.value) }
+					submitButton(R.string.register) {
+						onClick {
+							register(usernameText.value, passwordText.value, repeatPasswordText.value)
+						}
 					}
-					button(R.string.register) {
-						onClick { goTo(registerFragment, flipOutRight, flipInRight) }
-					}
-					progressBar = progressBar {
-						visibility = View.INVISIBLE
+					button(R.string.login) {
+						onClick { goTo(loginFragment, flipOutRight, flipInRight) }
 					}
 				}.lparams(width = matchParent) {
 					horizontalMargin = dip(30)
@@ -55,11 +54,14 @@ class LoginFragment : Fragment() {
 		}.view
 	}
 
-	suspend fun login(username: String, password: String) {
-		progressBar.visibility = View.VISIBLE
+
+
+	fun register(username: String, password: String, repeatPassword: String) {
+		errorChain(
+			username.isEmpty() to R.string.must_enter_username,
+			(password != repeatPassword) to R.string.password_not_same
+		) ?: return
 		toast("$username $password")
-		delay(1000)
-		progressBar.visibility = View.INVISIBLE
 	}
 
 }
