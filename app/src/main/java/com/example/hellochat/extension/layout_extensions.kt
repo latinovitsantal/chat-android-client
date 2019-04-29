@@ -31,3 +31,7 @@ fun ViewManager.submitButton(text: Int, builder: Button.() -> Unit = {}) =
 		textColor = ContextCompat.getColor(context, R.color.colorWhite)
 		builder()
 	}
+
+val GONE = View.GONE
+val VISIBLE = View.VISIBLE
+val INVISIBLE = View.INVISIBLE

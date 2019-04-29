@@ -1,15 +1,15 @@
-package com.example.hellochat.extension
+package com.example.hellochat.fragment
 
 import android.support.v4.app.*
 import com.example.hellochat.*
-import com.example.hellochat.fragment.*
 import org.jetbrains.anko.design.*
 
-val loginFragment by lazy { LoginFragment() }
-val registerFragment by lazy { RegisterFragment() }
 
 val Fragment.mainActivity get() = activity as MainActivity
-fun Fragment.goTo(fragment: Fragment, animOut: Int, animIn: Int) = mainActivity.goTo(fragment, animOut, animIn)
+
+fun Fragment.goTo(fragment: Fragment, addToBackStackNeeded: Boolean = false, anim: Anim? = null)
+		= mainActivity.goTo(fragment, addToBackStackNeeded, anim)
+
 fun Fragment.snackbar(message: Int) = view!!.snackbar(message)
 
 fun Fragment.errorChain(vararg conditionMessage: Pair<Boolean, Int>): Unit? {
@@ -21,3 +21,5 @@ fun Fragment.errorChain(vararg conditionMessage: Pair<Boolean, Int>): Unit? {
 	}
 	return Unit
 }
+
+val Fragment.storage get() = mainActivity.storage

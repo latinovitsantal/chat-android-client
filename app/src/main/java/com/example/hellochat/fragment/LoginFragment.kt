@@ -1,33 +1,32 @@
 package com.example.hellochat.fragment
 
-import android.graphics.*
-import android.opengl.*
 import android.os.*
 import android.support.v4.app.*
-import android.support.v4.content.*
-import android.text.method.*
 import android.view.*
 import android.widget.*
 import com.example.hellochat.*
 import com.example.hellochat.extension.*
-import kotlinx.coroutines.*
+import com.example.hellochat.network.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.*
 import org.jetbrains.anko.support.v4.*
 
+
+val loginFragment by lazy { LoginFragment() }
+
 class LoginFragment : Fragment() {
 
-	lateinit var progressBar: ProgressBar
+	private lateinit var progressBar: ProgressBar
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
 			scrollView {
 				verticalLayout {
 					title(R.string.login)
-					val usernameText = editText {
+					val usernameText = editText("bob") {
 						setHint(R.string.username_hint)
 					}
-					val passwordText = editText {
+					val passwordText = editText("pass") {
 						setHint(R.string.password_hint)
 						hidePassword()
 					}
@@ -43,10 +42,10 @@ class LoginFragment : Fragment() {
 						onClick { login(usernameText.value, passwordText.value) }
 					}
 					button(R.string.register) {
-						onClick { goTo(registerFragment, flipOutRight, flipInRight) }
+						onClick { goTo(registerFragment, false, flipOverLeft) }
 					}
 					progressBar = progressBar {
-						visibility = View.INVISIBLE
+						visibility = INVISIBLE
 					}
 				}.lparams(width = matchParent) {
 					horizontalMargin = dip(30)
@@ -55,11 +54,16 @@ class LoginFragment : Fragment() {
 		}.view
 	}
 
-	suspend fun login(username: String, password: String) {
-		progressBar.visibility = View.VISIBLE
-		toast("$username $password")
-		delay(1000)
-		progressBar.visibility = View.INVISIBLE
+	private fun login(username: String, password: String) {
+		progressBar.visibility = VISIBLE
+		doAsync {
+			val isSuccessful = ChatApi.login(username, password)
+			runOnUiThread {
+				progressBar.visibility = INVISIBLE
+				if (isSuccessful) goTo(contactsFragment, false, enterFromTop)
+				else snackbar(R.string.invalid_credentials)
+			}
+		}
 	}
 
 }

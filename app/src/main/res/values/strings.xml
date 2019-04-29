@@ -8,4 +8,10 @@
     <string name="register">Register</string>
     <string name="password_not_same">The passwords are not the same!</string>
     <string name="must_enter_username">You must enter username!</string>
+    <string name="invalid_credentials">Invalid credentials!</string>
+    <string name="search_for_contacts">Search for contacts</string>
+    <string name="write_message">Write message</string>
+    <string name="send">Send</string>
+    <string name="unknown">unknown</string>
+    <string name="send_message">Send Message</string>
 </resources>

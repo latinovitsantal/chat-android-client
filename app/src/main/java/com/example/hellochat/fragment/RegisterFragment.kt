@@ -9,6 +9,9 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.*
 import org.jetbrains.anko.support.v4.*
 
+
+val registerFragment by lazy { RegisterFragment() }
+
 class RegisterFragment : Fragment() {
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -16,9 +19,7 @@ class RegisterFragment : Fragment() {
 			scrollView {
 				verticalLayout {
 					title(R.string.register)
-					val usernameText = editText {
-						setHint(R.string.username_hint)
-					}
+					val usernameText = editText { setHint(R.string.username_hint) }
 					val passwordText = editText {
 						setHint(R.string.password_hint)
 						hidePassword()
@@ -40,23 +41,17 @@ class RegisterFragment : Fragment() {
 						}
 					}
 					submitButton(R.string.register) {
-						onClick {
-							register(usernameText.value, passwordText.value, repeatPasswordText.value)
-						}
+						onClick { register(usernameText.value, passwordText.value, repeatPasswordText.value) }
 					}
 					button(R.string.login) {
-						onClick { goTo(loginFragment, flipOutRight, flipInRight) }
+						onClick { goTo(loginFragment, false, flipUnderLeft) }
 					}
-				}.lparams(width = matchParent) {
-					horizontalMargin = dip(30)
-				}
+				}.lparams(width = matchParent) { horizontalMargin = dip(30) }
 			}
 		}.view
 	}
 
-
-
-	fun register(username: String, password: String, repeatPassword: String) {
+	private fun register(username: String, password: String, repeatPassword: String) {
 		errorChain(
 			username.isEmpty() to R.string.must_enter_username,
 			(password != repeatPassword) to R.string.password_not_same
