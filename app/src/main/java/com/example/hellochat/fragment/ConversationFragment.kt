@@ -10,9 +10,9 @@ import com.example.hellochat.*
 import com.example.hellochat.R
 import com.example.hellochat.data.*
 import com.example.hellochat.data.Message
+import com.example.hellochat.extension.*
 import com.example.hellochat.network.*
 import org.jetbrains.anko.*
-import org.jetbrains.anko.design.*
 import org.jetbrains.anko.sdk25.coroutines.*
 import org.jetbrains.anko.support.v4.*
 import java.lang.Exception
@@ -27,64 +27,102 @@ class ConversationFragment : Fragment() {
 
 	private lateinit var recyclerView: RecyclerView
 	private val contact = nextContact!!
-	private var messages = mutableListOf<Message>()
-
+	private var isActive = false
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		val view = inflater.inflate(R.layout.fragment_conversation, container, false)
-		Log.i("hellochat", "onCreateView0")
-		storage.conversations[contact]?.let { messages = it }
 		view.findViewById<RecyclerView>(R.id.messagesRecyclerView).run {
 			layoutManager = LinearLayoutManager(activity).apply {
 				reverseLayout = true
 			}
-			adapter = MessageAdapter(messages)
+			adapter = MessageAdapter(contact.messages)
 			recyclerView = this
 		}
-
 		recyclerView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
 			if (!recyclerView.canScrollVertically(-1))
-				doAsync {
-					val messagesCount = messages.size
-					ChatApi.getPrevMessagesOf(contact)
-					val messageCountDifference = messages.size - messagesCount
-					if (messageCountDifference > 0) runOnUiThread {
-						recyclerView.adapter!!.notifyItemRangeChanged(messagesCount, messageCountDifference)
-					}
-				}
+				getPrevMessages()
 		}
-
-		view.findViewById<Button>(R.id.sendButton).run {
-			onClick { recyclerView.scrollToPosition(0) }
+		val editText = view.findViewById<EditText>(R.id.messageEditText)
+		view.findViewById<Button>(R.id.sendButton).onClick {
+			sendMessage(editText.text.getStringThenClear())
 		}
-		Log.i("hellochat", "onCreateView")
 		return view
-	}
-
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		Log.i("hellochat", "onCreate")
 	}
 
 	override fun onStart() {
 		super.onStart()
+		getMessages()
+	}
+
+	override fun onResume() {
+		super.onResume()
+		isActive = true
+		getNewMessages()
+	}
+
+	override fun onPause() {
+		super.onPause()
+		isActive = false
+	}
+
+
+	private fun goToBottom() {
+		recyclerView.scrollToPosition(0)
+	}
+
+
+	private fun getMessages() {
 		doAsync {
-			Log.i("hellochat", "beforeGet")
 			ChatApi.getMessagesOf(contact)
-			Log.i("hellochat", "afterGet")
 			runOnUiThread {
-				Log.i("hellochat", "beforeNotify")
 				recyclerView.adapter!!.notifyDataSetChanged()
-				Log.i("hellochat", "afterNotify")
 			}
 		}
-		Log.i("hellochat", "onStart")
+	}
+
+	private fun getPrevMessages() {
+		doAsync {
+			val messageCount = contact.messages.size
+			ChatApi.getPrevMessagesOf(contact)
+			val messageCountDifference = contact.messages.size - messageCount
+			if (messageCountDifference > 0) runOnUiThread {
+				recyclerView.adapter!!.notifyItemRangeChanged(messageCount, messageCountDifference)
+			}
+		}
+	}
+
+	private fun getNewMessages() {
+		doAsync {
+			while (isActive) {
+				Thread.sleep(500)
+				val messageCount = contact.messages.size
+				ChatApi.seeMessagesOf(contact)
+				val messageCountDifference = contact.messages.size - messageCount
+				val wasAtBottom = !recyclerView.canScrollVertically(1)
+				if (messageCountDifference > 0) runOnUiThread {
+					recyclerView.adapter!!.notifyItemRangeInserted(0, messageCountDifference)
+					if (wasAtBottom)
+						goToBottom()
+				}
+			}
+		}
+	}
+
+	private fun sendMessage(message: String) {
+		val messageToSend = message.trim()
+		if (messageToSend.isNotEmpty()) {
+			goToBottom()
+			doAsync {
+				ChatApi.sendMessage(message, contact)
+			}
+		}
 	}
 
 }
 
 
-class MessageAdapter(val messages: MutableList<Message>) : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
+class MessageAdapter(private val messages: MutableList<Message>)
+	: RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
 
 	class ViewHolder(val messageLayout: LinearLayout) : RecyclerView.ViewHolder(messageLayout)
 
@@ -99,7 +137,7 @@ class MessageAdapter(val messages: MutableList<Message>) : RecyclerView.Adapter<
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		holder.messageLayout.run {
 			val senderNameTextView = findViewById<TextView>(R.id.senderNameTextView)
-			val messageTextView = findViewById<TextView>(R.id.messageTextView)
+			val messageTextView = findViewById<TextView>(R.id.messageEditText)
 			messages[position].run {
 				gravity = if (username == MainActivity.instance.storage.username) Gravity.END else Gravity.START
 				senderNameTextView.text = username ?: ""

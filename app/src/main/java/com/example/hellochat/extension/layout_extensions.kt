@@ -1,6 +1,7 @@
 package com.example.hellochat.extension
 
 import android.support.v4.content.*
+import android.text.*
 import android.text.method.*
 import android.view.*
 import android.widget.*
@@ -32,6 +33,8 @@ fun ViewManager.submitButton(text: Int, builder: Button.() -> Unit = {}) =
 		builder()
 	}
 
-val GONE = View.GONE
-val VISIBLE = View.VISIBLE
-val INVISIBLE = View.INVISIBLE
+fun Editable.getStringThenClear() = toString().also { clear() }
+
+const val GONE = View.GONE
+const val VISIBLE = View.VISIBLE
+const val INVISIBLE = View.INVISIBLE

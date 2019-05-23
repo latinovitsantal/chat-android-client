@@ -8,11 +8,19 @@ data class Storage(
 	var accessToken: String = "",
 	var refreshToken: String = "",
 	var username: String = "",
-	var conversations: MutableMap<Contact, MutableList<Message>> = mutableMapOf()
+	var contacts: MutableList<Contact> = mutableListOf(),
+	var requests: MutableList<FriendRequest> = mutableListOf()
 ) {
 
 	fun save(context: Context) {
 		File(context.filesDir, FILENAME).writeJson(this)
+	}
+
+	fun logout() {
+		accessToken = ""
+		refreshToken = ""
+		username = ""
+		contacts = mutableListOf()
 	}
 
 	companion object {
@@ -30,7 +38,6 @@ data class Storage(
 		}
 
 		fun File.isEmpty() = readText().isEmpty()
-
 
 	}
 

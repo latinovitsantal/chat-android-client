@@ -14,4 +14,14 @@
     <string name="send">Send</string>
     <string name="unknown">unknown</string>
     <string name="send_message">Send Message</string>
+    <string name="logged_in">logged in:</string>
+    <string name="logout">Log out</string>
+    <string name="log_out">Log out</string>
+    <string name="request_from_">Request from:</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="send_request">Send Request</string>
+    <string name="unsee_messages">Unseen messages</string>
+    <string name="channel_name">hellochat channel</string>
+    <string name="channel_description">This is my notification channel</string>
 </resources>

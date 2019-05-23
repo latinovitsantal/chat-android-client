@@ -60,7 +60,9 @@ class LoginFragment : Fragment() {
 			val isSuccessful = ChatApi.login(username, password)
 			runOnUiThread {
 				progressBar.visibility = INVISIBLE
-				if (isSuccessful) goTo(contactsFragment, false, enterFromTop)
+				if (isSuccessful) {
+					goTo(contactsFragment, false, enterFromTop)
+				}
 				else snackbar(R.string.invalid_credentials)
 			}
 		}

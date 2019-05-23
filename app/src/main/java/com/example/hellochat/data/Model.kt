@@ -7,11 +7,7 @@ data class Contact(
 	var unseenCount: Int,
 	var lastUpdated: String
 ) {
-	override fun equals(other: Any?) = when (other) {
-		is Contact -> id == other.id
-		else -> false
-	}
-	override fun hashCode() = id.hashCode()
+	var messages = mutableListOf<Message>()
 }
 
 data class Message(
@@ -20,13 +16,11 @@ data class Message(
 	var time: String,
 	var username: String?,
 	var isOwned: Boolean
-) {
-	override fun equals(other: Any?) = when (other) {
-		is Message -> id == other.id
-		else -> false
-	}
-	override fun hashCode() = id.hashCode()
-}
+)
+
+data class FriendRequest(var username: String, var time: String)
+
+data class PostMessage(val id: Long, val text: String)
 
 
 fun Contact.refreshFrom(contact: Contact) {
